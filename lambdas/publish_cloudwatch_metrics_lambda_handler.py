@@ -11,10 +11,11 @@ from base64 import *
 ENCRYPTED_REDSHIFT_MASTER_PASSWORD = os.environ['REDSHIFT_MASTER_PASSWORD']
 DECRYPTED_REDSHIFT_MASTER_PASSWORD = boto3.client('kms').decrypt(CiphertextBlob=b64decode(ENCRYPTED_REDSHIFT_MASTER_PASSWORD))['Plaintext'].decode('utf-8')
 REDSHIFT_SQL_DIR = os.path.join(PROJECT_DIR, 'redshift_sql')
-
+table_name = os.environ['DDB_MANIFEST_TABLE_ARN'].split('/')[1]
+curated_records_index_name = os.environ['DDB_CURATED_RECORDS_INDEX_NAME']
  
 
-def __publish_persist_records_to_cloudwath(table_name,batch_id):
+def __publish_persist_records_to_cloudwath(batch_id):
     try:
         LoggerUtility.logInfo("Started querying elt_run_state_stats for batch {} ".format(batch_id))
         redshift_manager = __make_redshift_manager()
@@ -23,23 +24,23 @@ def __publish_persist_records_to_cloudwath(table_name,batch_id):
         __publishCustomMetricsToCloudwatch(cursor)
         
     except Exception as e:
-        LoggerUtility.logInfo("Failed to persist records to cloudwatch for batch "
+        LoggerUtility.logInfo("Failed to publish persist metrics to cloudwatch for batch "
                               " - {} with exception - {}".format(batch_id, e))
         raise
 
-def __publish_pre_persist_records_to_cloudwath(table_name,batch_id):
+def __publish_pre_persist_records_to_cloudwath(batch_id):
     try:
             dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-            table = dynamodb.Table('dev-CurationManifestFilesTable')
+            table = dynamodb.Table(table_name)
             response = table.query(
-               IndexName="dev-BatchId-TableName-index",
+               IndexName=curated_records_index_name,
                 KeyConditionExpression=Key('BatchId').eq(batch_id))
             for item in response['Items']:
                 totalCuratedRecordsByState=item["TotalCuratedRecordsByState"]
                 __publishPrePersistCustomMetricsToCloudwatch(item["TableName"],totalCuratedRecordsByState)
         
     except Exception as e:
-        LoggerUtility.logInfo("Failed to persist get status for batch "
+        LoggerUtility.logInfo("Failed to publish pre-presist metrics to cloudwatch for batch "
                               " - {} with exception - {}".format(batch_id, e))
         raise
 def __publishPrePersistCustomMetricsToCloudwatch(tableName, totalCuratedRecordsByState):
@@ -116,8 +117,8 @@ def __make_redshift_manager():
     )
 
 
-def publish_cloudwatch_metrics(event, context, batch_id, tableName):
+def publish_cloudwatch_metrics(event, context, batch_id):
     LoggerUtility.setLevel()
     
-    __publish_pre_persist_records_to_cloudwath(tableName,batch_id)
-    __publish_persist_records_to_cloudwath(tableName, batch_id)
+    __publish_pre_persist_records_to_cloudwath(batch_id)
+    __publish_persist_records_to_cloudwath(batch_id)

@@ -7,7 +7,6 @@ def lambda_handler(event, context):
     txt=json.dumps(event[0])
     batch_id = json.loads(txt).get("batchId")
     if batch_id is None:
-        return event
-    tableName = json.loads(txt).get("tablename")
-    publish_cloudwatch_metrics(event, context, batch_id,tableName)
+        return event 
+    publish_cloudwatch_metrics(event, context, batch_id)
     return event
