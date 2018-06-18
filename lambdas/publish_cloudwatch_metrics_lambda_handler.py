@@ -23,7 +23,7 @@ def __publish_persist_records_to_cloudwath(table_name,batch_id):
         __publishCustomMetricsToCloudwatch(cursor)
         
     except Exception as e:
-        LoggerUtility.logInfo("Failed to persist get status for batch "
+        LoggerUtility.logInfo("Failed to persist records to cloudwatch for batch "
                               " - {} with exception - {}".format(batch_id, e))
         raise
 
@@ -116,7 +116,7 @@ def __make_redshift_manager():
     )
 
 
-def persist_curated_datasets(event, context, batch_id, tableName):
+def publish_cloudwatch_metrics(event, context, batch_id, tableName):
     LoggerUtility.setLevel()
     
     __publish_pre_persist_records_to_cloudwath(tableName,batch_id)
