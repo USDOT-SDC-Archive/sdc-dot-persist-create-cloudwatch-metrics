@@ -1,2 +1,1 @@
-select a.state,b.table_name,a.total_rows_ingested from etl_waze.elt_run_state_stats a,etl_waze.DW_TBL_INFO b where etl_run_id={{ batchIdValue }} and b.table_id=a.table_id
-
+select a.state,b.table_name,a.ingested_rows from {{ elt_schema_name }}.elt_run_state_stats_realtime a,{{ elt_schema_name }}.DW_TBL_INFO b where elt_run_id={{ batchIdValue }} and b.table_id=a.table_id
