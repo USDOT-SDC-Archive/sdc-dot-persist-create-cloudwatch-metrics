@@ -32,5 +32,5 @@ omit=
 
 [html]
 directory = html_coverage_reports
-title = Coverage Report for sdc-dot-waze-close-manifest-pipeline
+title = Coverage Report for sdc-dot-persist-create-cloudwatch-metrics
 
