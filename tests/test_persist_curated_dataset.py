@@ -1,11 +1,13 @@
 import os
-import pytest
+from unittest import mock
+
 import boto3
 import botocore
-from lambdas import persist_curated_dataset_lambda_handler
+import pytest
 from moto import mock_cloudwatch
 from moto import mock_dynamodb
-from unittest import mock
+
+from lambdas import persist_curated_dataset_lambda_handler
 
 
 def test__make_redshift_manager(monkeypatch):
@@ -28,7 +30,6 @@ def test__make_redshift_manager(monkeypatch):
     class MockRedshiftConnection:
 
         def __init__(self, user, password, redshift_jdbc_url):
-
             self.user = user
             self.password = password
             self.redshift_jdbc_url = redshift_jdbc_url
@@ -36,7 +37,6 @@ def test__make_redshift_manager(monkeypatch):
     class MockRedshiftManager:
 
         def __init__(self, region_name, redshift_role_arn, redshift_connection, query_loader):
-
             self.region_name = region_name
             self.redshift_role_arn = redshift_role_arn
             self.redshift_connection = redshift_connection
@@ -74,9 +74,9 @@ def test__publish_custom_metrics_to_cloudwatch():
 def test__publish_pre_persist_custom_metrics_to_cloudwatch():
     with pytest.raises(botocore.exceptions.ParamValidationError):
         total_curated_records_by_state = {
-                "key1": 1,
-                "key2": "2",
-            }
+            "key1": 1,
+            "key2": "2",
+        }
 
         persist_curated_dataset_lambda_handler.__publish_pre_persist_custom_metrics_to_cloudwatch(
             "table_name",
@@ -86,7 +86,6 @@ def test__publish_pre_persist_custom_metrics_to_cloudwatch():
 
 @mock_dynamodb
 def test__publish_pre_persist_records_to_cloudwatch(monkeypatch):
-
     os.environ["CURATION_MANIFEST_TABLE"] = 'dev-CurationManifestFilesTable'
     os.environ["CURATION_MANIFEST_TABLE_BATCH_INDX"] = "random_index_name"
 
@@ -124,8 +123,6 @@ def test__publish_pre_persist_records_to_cloudwatch(monkeypatch):
 
 
 def test__publish_persist_records_to_cloudwatch_historical():
-
-    table_name = "this param is not currently used"
     batch_id = 00000
     is_historical = True
 
@@ -141,7 +138,7 @@ def test__publish_persist_records_to_cloudwatch_historical():
     persist_curated_dataset_lambda_handler.__publish_custom_metrics_to_cloudwatch = mock.MagicMock()
     persist_curated_dataset_lambda_handler.__make_redshift_manager = mock_make_redshift_manager
 
-    persist_curated_dataset_lambda_handler.__publish_persist_records_to_cloudwatch(table_name, batch_id, is_historical)
+    persist_curated_dataset_lambda_handler.__publish_persist_records_to_cloudwatch(batch_id, is_historical)
 
     persist_curated_dataset_lambda_handler.__publish_custom_metrics_to_cloudwatch.assert_called_with(
         {
@@ -153,8 +150,6 @@ def test__publish_persist_records_to_cloudwatch_historical():
 
 
 def test__publish_persist_records_to_cloudwatch_not_historical():
-
-    table_name = "this param is not currently used"
     batch_id = 00000
     is_historical = False
 
@@ -170,7 +165,7 @@ def test__publish_persist_records_to_cloudwatch_not_historical():
     persist_curated_dataset_lambda_handler.__publish_custom_metrics_to_cloudwatch = mock.MagicMock()
     persist_curated_dataset_lambda_handler.__make_redshift_manager = mock_make_redshift_manager
 
-    persist_curated_dataset_lambda_handler.__publish_persist_records_to_cloudwatch(table_name, batch_id, is_historical)
+    persist_curated_dataset_lambda_handler.__publish_persist_records_to_cloudwatch(batch_id, is_historical)
 
     persist_curated_dataset_lambda_handler.__publish_custom_metrics_to_cloudwatch.assert_called_with(
         {
@@ -179,4 +174,3 @@ def test__publish_persist_records_to_cloudwatch_not_historical():
             "elt_schema_name": "elt_waze"
         }
     )
-
