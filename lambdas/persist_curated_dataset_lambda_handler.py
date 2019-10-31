@@ -1,24 +1,23 @@
+from base64 import *
+
+import boto3
+from boto3.dynamodb.conditions import Attr, Key
+
 from common.logger_utility import *
-from concurrent.futures import ThreadPoolExecutor
-import functools
 from common.redshift import RedshiftManager, RedshiftConnection
 from common.template_loader import TemplateLoader
 from root import PROJECT_DIR
-import boto3
-from boto3.dynamodb.conditions import Attr, Key
-from base64 import *
 
 
-def __publish_persist_records_to_cloudwatch(table_name, batch_id, is_historical):
+def __publish_persist_records_to_cloudwatch(batch_id, is_historical):
     """
     Publish persist records to cloudwatch
-    :param table_name: Not used
     :param batch_id:
     :param is_historical:
     :return:
     """
     try:
-        LoggerUtility.logInfo("Started querying elt_run_state_stats for batch {} ".format(batch_id))
+        LoggerUtility.log_info("Started querying elt_run_state_stats for batch {} ".format(batch_id))
 
         # create a redshift manager instance
         redshift_manager = __make_redshift_manager()
@@ -38,8 +37,8 @@ def __publish_persist_records_to_cloudwatch(table_name, batch_id, is_historical)
         __publish_custom_metrics_to_cloudwatch(cursor)
 
     except Exception as e:
-        LoggerUtility.logInfo("Failed to persist get status for batch "
-                              " - {} with exception - {}".format(batch_id, e))
+        LoggerUtility.log_info("Failed to persist get status for batch "
+                               " - {} with exception - {}".format(batch_id, e))
         raise
 
 
@@ -67,8 +66,8 @@ def __publish_pre_persist_records_to_cloudwatch(table_name, batch_id, is_histori
             __publish_pre_persist_custom_metrics_to_cloudwatch(item["TableName"], total_curated_records_by_state)
 
     except Exception as e:
-        LoggerUtility.logInfo("Failed to persist get status for batch "
-                              " - {} with exception - {}".format(batch_id, e))
+        LoggerUtility.log_info("Failed to persist get status for batch "
+                               " - {} with exception - {}".format(batch_id, e))
         raise
 
 
@@ -167,8 +166,8 @@ def __make_redshift_manager():
     )
 
 
-def persist_curated_datasets(event, context, batch_id, table_name, is_historical):
-    LoggerUtility.setLevel()
+def persist_curated_datasets(batch_id, table_name, is_historical):
+    LoggerUtility.set_level()
 
     __publish_pre_persist_records_to_cloudwatch(table_name, batch_id, is_historical)
-    __publish_persist_records_to_cloudwatch(table_name, batch_id, is_historical)
+    __publish_persist_records_to_cloudwatch(batch_id, is_historical)
