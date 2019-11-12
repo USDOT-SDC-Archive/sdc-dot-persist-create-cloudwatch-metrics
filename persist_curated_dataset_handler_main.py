@@ -3,7 +3,7 @@ import json
 from lambdas.persist_curated_dataset_lambda_handler import *
 
 
-def lambda_handler(event, *args, **kwargs):
+def lambda_handler(event, context):
     LoggerUtility.set_level()
     txt = json.dumps(event[0])
     batch_id = json.loads(txt).get("batchId")
