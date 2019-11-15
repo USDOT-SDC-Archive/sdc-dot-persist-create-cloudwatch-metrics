@@ -1,7 +1,7 @@
 
-[![Build Status](https://travis-ci.com/usdot-jpo-sdc-projects/sdc-dot-persist-create-cloudwatch-metrics.svg?branch=master)](https://travis-ci.com/usdot-jpo-sdc-projects/sdc-dot-persist-create-cloudwatch-metrics)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-waze-update-manifest-status&metric=alert_status)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-waze-update-manifest-status)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-waze-update-manifest-status&metric=coverage)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-waze-update-manifest-status)
+[![Build Status](https://travis-ci.org/usdot-jpo-sdc-projects/sdc-dot-persist-create-cloudwatch-metrics.svg?branch=master)](https://travis-ci.org/usdot-jpo-sdc-projects/sdc-dot-persist-create-cloudwatch-metrics)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-persist-create-cloudwatch-metrics&metric=alert_status)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-persist-create-cloudwatch-metrics)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=usdot-jpo-sdc-projects_sdc-dot-persist-create-cloudwatch-metrics&metric=coverage)](https://sonarcloud.io/dashboard?id=usdot-jpo-sdc-projects_sdc-dot-persist-create-cloudwatch-metrics)
 # sdc-dot-persist-create-cloudwatch-metrics
 This lambda function is responsible for publishing the records in the custom cloudwatch metrics.
 
